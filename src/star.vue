@@ -6,6 +6,11 @@
             <stop :offset="getFill" :stop-color="(rtl) ? activeColor : inactiveColor" />
         </linearGradient>
 
+        <linearGradient v-if="borderActiveColor" :id="borderGrad" x1="0" x2="100%" y1="0" y2="0">
+            <stop :offset="getFill" :stop-color="(rtl) ? getBorderColor : borderActiveColor" />
+            <stop :offset="getFill" :stop-color="(rtl) ? borderActiveColor : getBorderColor" />
+        </linearGradient>
+
         <filter :id="glowId"  height="130%" width="130%" filterUnits="userSpaceOnUse">
             <feGaussianBlur :stdDeviation="glow" result="coloredBlur"/>
             <feMerge>
@@ -17,7 +22,7 @@
         <polygon :points="starPointsToString" :fill="getGradId" :stroke="glowColor"
               :filter="'url(#'+this.glowId+')'" v-show="fill > 1" />
 
-        <polygon :points="starPointsToString" :fill="getGradId" :stroke="getBorderColor" :stroke-width="border" :stroke-linejoin="roundedCorners ? 'round' : 'miter'" />
+        <polygon :points="starPointsToString" :fill="getGradId" :stroke="borderActiveColor ? getBorderGradId : getBorderColor" :stroke-width="border" :stroke-linejoin="roundedCorners ? 'round' : 'miter'" />
         <polygon :points="starPointsToString" :fill="getGradId" />
     </svg>
 </template>
@@ -55,6 +60,10 @@ export default {
             type: String,
             default: '#000'
         },
+        borderActiveColor: {
+            type: String,
+            default: false
+        },
         borderWidth: {
             type: Number,
             default: 0
@@ -80,6 +89,7 @@ export default {
         this.starPoints = (this.points.length) ? this.points : this.starPoints
         this.calculatePoints()
         this.grad = this.getRandomId()
+        this.borderGrad = this.getRandomId()
         this.glowId = this.getRandomId()
     },
     computed: {
@@ -88,6 +98,9 @@ export default {
         },
         getGradId() {
             return 'url(#' + this.grad + ')'
+        },
+        getBorderGradId() {
+            return 'url(#' + this.borderGrad + ')'
         },
         getSize() {
             // Adjust star size when rounded corners are set with no border, to account for the 'hidden' border
